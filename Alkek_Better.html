@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Babylon Template</title>
+
+    <style>
+      html,
+      body {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #renderCanvas {
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+      }
+    </style>
+
+    <script src="https://preview.babylonjs.com/babylon.js"></script>
+    <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+
+    <script src="Alkek_Library.js"></script>
+  </head>
+
+  <body>
+    <canvas id="renderCanvas" touch-action="none"></canvas>
+    <!-- touch-action="none" for best results from PEP -->
+
+    <script>
+      var canvas = document.getElementById("renderCanvas"); // Get the canvas element
+      var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+      var camera;
+      var skybox;
+      var currentRadius;
+      var myVidTex;
+      var QVideo = false;
+      var shaderMaterial; //funky AR projector
+      var shaderMaterial2; //funky AR projector2
+
+      var ghostOpacity = 0.2;
+      var PT = 1;
+      window.addEventListener("dblclick", function () {
+        PT = 0;
+      }),
+        window.addEventListener("click", function () {
+          PT = 1;
+        });
+      /******* Add the create scene function ******/
+      var createScene = function () {
+        // Create the scene space
+        var scene = new BABYLON.Scene(engine);
+
+        // Add a camera to the scene and attach it to the canvas
+        camera = new BABYLON.ArcRotateCamera(
+          "Camera",
+          0,
+          Math.PI / 2,
+          90,
+          new BABYLON.Vector3(0, 0, 5),
+          scene
+        );
+        camera.attachControl(canvas, true);
+        camera.pinchPrecision = 20;
+        camera.wheelPrecision = 50;
+        camera.angularSensibilityX = 5250;
+        camera.angularSensibilityY = 6650;
+        // Add lights to the scene
+        var light1 = new BABYLON.HemisphericLight(
+          "light1",
+          new BABYLON.Vector3(1, 1, 0),
+          scene
+        );
+
+        return scene;
+      };
+      var scene = createScene(); //Call the createScene function
+
+      //**************************begin Workshop*******************************************
+      //**************************begin Workshop*******************************************
+      //**************************begin Workshop*******************************************
+
+      /*Instructions Preliminary to Develope
+      For PC running chrome, we need to be in development mode
+      type Command in the search window copy  -- >
+      "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-web-security --disable-gpu --user-data-dir=~/chromeTemp"
+
+      For MACOS
+      in Safari, Preferences. Go to Advanced tab, on bottom check "Show Develop Menu in Menu Bar"
+      in Safari, Develop Go down and check Disable Cross-Origin Restrictions
+      */
+
+      //What is a comment? What is a Skybox?
+      var skyBoxSize = 100.0;
+
+      //****Show Coordinate System. What is Coordinate
+      //****showWorldAxis(size,atx,aty,atz)
+      //showWorldAxis(4,0,6,0);
+      //What is a camera? Coordinate System? Position?
+      camera.position = new BABYLON.Vector3(0,10,-skyBoxSize / 2.0 + 0.1 * skyBoxSize);
+
+      //What is a camera target?
+      camera.target = new BABYLON.Vector3(0, 10, 0);
+
+      //****What is a skybox? How are the files named?
+      //****Alkek_makeSkyBox(sizeSkyBox, fileSkyBox, x, y, z);
+      Alkek_makeSkyBox(skyBoxSize,"textures/images/skybox/wasmon",0,skyBoxSize / 2,0);
+
+      //****Make two walls for the gallery paintings and photographs
+      //****Alkek_makeBox(myWidth,myHeight,myDepth,x,y,z,rotx,roty,rotz,picFile,giveUniqueName);
+      Alkek_makeBox(30,80,2,-20,40,-10,0,0,0,"textures/images/materials/stone8.jpg","void_LeftWall");
+      Alkek_makeBox(30,80,2,20,40,-10,0,0,0,"textures/images/materials/stone8.jpg","void_RightWall");
+
+      //****How to make a picture frame
+      //****Alkek_framePicture(picFile,frameHeight,frameThickness,picFrame,x,y,z,rotx,roty,rotz,giveUniqueName);
+      Alkek_framePicture("textures/images/myPhotos/waterfall.jpg",25,0.5,"textures/images/materials/stone2.jpg",
+       0,25,skyBoxSize / 2.0,0,0,0,"waterfall");
+
+      //****Shine a spot light on the picture
+      //****Alkek_makeSpotLight(x,y,z,dirX,dirY,dirZ,fillAngle,giveUniqueName);
+      Alkek_makeSpotLight(0,40,skyBoxSize/2.0-20, 0, -3,13,1.57,"pictureSpotLight");
+
+
+
+   //****Handle Click Events, types of clicks
+      //****Alkek_handleClick(timeToMoveTo, howCloseToObject);
+      Alkek_handleClick(4, 5);
+
+
+      //****How to make a picture frame
+      //****Alkek_framePicture(picFile,frameHeight,frameThickness,picFrame,x,y,z,rotx,roty,rotz,giveUniqueName);
+     Alkek_framePicture(
+      "textures/images/myPhotos/pinkfloyd.jpg",12,0.5,"textures/images/materials/stone2.jpg",
+       -15,10,-12,0,0,0,"abstract");
+
+       //****Shine a spot light on the picture
+      //****Alkek_makeSpotLight(x,y,z,dirX,dirY,dirZ,fillAngle,giveUniqueName);
+      Alkek_makeSpotLight(0,30,-25,0,-1,2,3.14/1.2,"paintingLight");
+
+
+      //****How to make a TV to show videos
+      //****Alkek_makeTV(videoFile,picFrame,tvHeight,x,y,z,rotx,roty,rotz,giveUniqueName);
+     Alkek_makeTV("textures/videos/21.mp4","textures/images/materials/stone2.jpg",
+     15,30,15,skyBoxSize / 2.0,0,0,0,"myTv");
+
+
+
+
+
+
+
+      //****This is for specialized Spatial AR Projection
+      Alkek_makeFunkyShaders("textures/images/shaders/amiga.jpg",
+       "textures/images/shaders/rodgera.jpg");
+
+      //****Alkek_loadARSculpture(sculptureDirectory,sculptureFile,scale,x,y,z,rotx,roty,rotz)
+      //--->Alkek_loadARSculpture("textures/models/","aball.glb",3.25,0,8,7,0,0,0,"projectedSculpture");
+
+
+
+      //****Makes a spherical video or image display
+      //****Alkek_makePuffer(myDiameter,x,y,z,rotx,roty,rotz,picFile,giveUniqueName);
+      Alkek_makePuffer(6,12,8,-16,3.14,0,0,"textures/images/myPhotos/360.jpg","puffer1");
+
+
+
+    //****How to videoCast onto another object
+      //****Alkek_showVideoOn(meshName);
+
+      //**************************end Workshop*******************************************
+      //**************************end Workshop*******************************************
+
+      Alkek_makeBox(
+        skyBoxSize,
+        skyBoxSize,
+        1,
+        0,
+        0,
+        0,
+        1.57,
+        0,
+        0,
+        "textures/images/skybox/wasmon_ny.jpg",
+        "void_fix"
+      );
+
+      // Alkek_makeRoom(120, 80, 20, "sidewall.jpg");
+      scene.registerBeforeRender(function () {});
+
+      // Register a render loop to repeatedly render the scene
+      engine.runRenderLoop(function () {
+        scene.render();
+      });
+
+      // Watch for browser/canvas resize events
+      window.addEventListener("resize", function () {
+        engine.resize();
+      });
+      async function CheckUrl(url) {
+        const response = await fetch(url, {
+          method: "head",
+          mode: "no-cors",
+        });
+        return response.status == 200;
+      }
+    </script>
+  </body>
+</html>
